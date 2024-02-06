@@ -2,13 +2,13 @@ import csv
 import random
 import time
 import os
+import numpy as np
 
 file_path = 'data.csv'
 xy = 'x','y'
 
 # Function to generate random values between 0 and 10
-def generate_random_value():
-    return random.uniform(0, 10)
+random.uniform(0, 10)
 
 # Function to append values to the CSV file
 def append_to_csv(file_path, values):
@@ -19,10 +19,10 @@ def append_to_csv(file_path, values):
 def main():
     start_time = time.time()
     for i in range(50):
-        random_value = time.time() - start_time, generate_random_value()
-        append_to_csv(file_path, random_value)
-        print(f"Random values {random_value} appended to {file_path}")
-        time.sleep(1)
+        value = time.time() - start_time,  np.log(i+1) * (random.random() + 6)/7
+        append_to_csv(file_path, value)
+        print(f"Random values {value} appended to {file_path}")
+        #time.sleep(1)
 
         
 
