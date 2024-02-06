@@ -1,0 +1,15 @@
+body {
+    background: rgb(98, 103, 107);
+    color: #bbb7b7;
+    font-family: Helvetica;
+    text-align: center;
+    margin: 0;
+  }
+
+h1 {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    font-family: "Times New Roman", Times, serif;
+}

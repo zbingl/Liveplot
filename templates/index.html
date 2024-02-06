@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="css/text" href="main.css">
     <title>Live Plot from CSV Data</title>
 </head>
 <body>
-    <h1>Live Plot</h1>
-    <img id="livePlot" alt="Live Plot">
+    <h1>Sensor data against time since measurment start</h1>
+    <img id="livePlot">
     
     <script>
-        // Function to update the image every second
+        document.getElementById('livePlot').src = "{{ url_for('plot_image') }}";
+        
         function updateImage() {
             document.getElementById('livePlot').src = "{{ url_for('plot_image') }}";
+            setTimeout(() => {  console.log("World!"); }, 3000);
+            location.reload();
+            console.log("hello");
         }
 
+        
+
+        
         // Call the updateImage function every second
-        setInterval(updateImage, 1000);
+        setInterval(updateImage, 2000);
+
     </script>
 </body>
 </html>

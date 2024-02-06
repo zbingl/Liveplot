@@ -22,7 +22,7 @@ def main():
         value = time.time() - start_time,  np.log(i+1) * (random.random() + 6)/7
         append_to_csv(file_path, value)
         print(f"Random values {value} appended to {file_path}")
-        #time.sleep(1)
+        time.sleep(1)
 
         
 

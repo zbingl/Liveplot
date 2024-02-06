@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from flask import Flask, render_template, Response
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from matplotlib.figure import Figure
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 
@@ -20,18 +23,20 @@ def read_csv(filename='data.csv'):
 # Function to generate Matplotlib plot
 def generate_plot():
     x, y = read_csv()
-
-    plt.figure(figsize=(8, 4))
-    plt.plot(x, y, marker='o', linestyle='-', color='b')
-    plt.title('Live Plot from CSV Data')
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.grid(True)
-    plt.tight_layout()
-
+    fig = Figure()
+    ax = fig.subplots()
+    ax.plot(x, y, marker='o', linestyle='-', color='b')
+    #ax.title('Live Plot from CSV Data')
+    #ax.xlabel('X-axis')
+    #ax.ylabel('Y-axis')
+    #ax.grid(True)
+    #ax.tight_layout()
     # Save the plot to a temporary file
-    plt.savefig('static/plot.png')
-    plt.close()
+    fig.savefig('static/plot.png')
+
+
+    #fig.savefig(buf, format="png")
+    #data = f'data:image/png;base64,{base64.b64encode(buf.getbuffer()).decode("ascii")}'
 
 # Watchdog event handler to detect changes in the CSV file
 class CSVHandler(FileSystemEventHandler):
@@ -48,6 +53,8 @@ def index():
 @app.route('/plot.png')
 def plot_image():
     return Response(open('static/plot.png', 'rb').read(), mimetype='image/png')
+
+
 
 if __name__ == '__main__':
     generate_plot()  # Initial plot generation
