@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Plot from CSV Data</title>
+</head>
+<body>
+    <h1>Live Plot</h1>
+    <img id="livePlot" alt="Live Plot">
+    
+    <script>
+        // Function to update the image every second
+        function updateImage() {
+            document.getElementById('livePlot').src = "{{ url_for('plot_image') }}";
+        }
+
+        // Call the updateImage function every second
+        setInterval(updateImage, 1000);
+    </script>
+</body>
+</html>
