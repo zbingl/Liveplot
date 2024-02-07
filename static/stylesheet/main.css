@@ -1,14 +1,13 @@
 body {
-    background: rgb(98, 103, 107);
-    color: #bbb7b7;
+    background-color: rgb(183, 186, 189);
     font-family: Helvetica;
     text-align: center;
     margin: 0;
-  }
+}
 
 h1 {
     display: block;
-    font-size: 2em;
+    font-size: 2.5em;
     font-weight: bold;
     text-align: center;
     font-family: "Times New Roman", Times, serif;
