@@ -5,7 +5,8 @@ import os
 import numpy as np
 
 file_path = 'data.csv'
-xy = 'x','y'
+
+
 
 # Function to generate random values between 0 and 10
 random.uniform(0, 10)
@@ -16,20 +17,22 @@ def append_to_csv(file_path, values):
         csv.writer(csvfile).writerow(values)
 
 
+modifiers = ["t"]
+for i in range(20):
+    modifiers.append(random.randint(1,30))
+
 def main():
     start_time = time.time()
-    for i in range(50):
-        value = time.time() - start_time,  np.log(i+1) * (random.random() + 6)/7
+    for i in range(200):
+        value = [time.time() - start_time] + [k*np.log(i+1)*(random.random()+6)/7 for k in modifiers[1:]]
         append_to_csv(file_path, value)
-        print(f"Random values {value} appended to {file_path}")
+        print(f"Random values appended")
         time.sleep(1)
-
-        
 
 if not os.path.isfile(file_path):
     print(os.path.isfile(file_path))
     with open(file_path, 'w', newline='') as csvfile:
-        append_to_csv(file_path, xy)
+        append_to_csv(file_path, modifiers)
         main()
 else:
     print(os.path.isfile(file_path))

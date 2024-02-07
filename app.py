@@ -10,29 +10,39 @@ import base64
 app = Flask(__name__)
 
 # Function to read data from CSV file
-def read_csv(filename='data.csv'):
-    x_vals, y_vals = [], []
-    with open(filename, 'r') as file:
-        reader = csv.reader(file)
-        next(reader)  # Skip header
-        for row in reader:
-            x_vals.append(float(row[0]))
-            y_vals.append(float(row[1]))
-    return x_vals, y_vals
+def read_csv(file_path):
+    columns = []
+    with open(file_path, 'r') as file:
+        csv_reader = csv.reader(file)
+        headers = next(csv_reader)  # Skip the header row
+        num_columns = len(headers)
+        
+        # Initialize lists for each column
+        for _ in range(num_columns):
+            columns.append([])
 
-
-
-
+        # Read data into columns
+        for row in csv_reader:
+            for i in range(num_columns):
+                columns[i].append(float(row[i]))
+    return columns
 
 
 
 # Function to generate Matplotlib plot
 def generate_plot():
-    x, y = read_csv()
-    fig = Figure()
+    columns = read_csv('data.csv')
+
+    fig = Figure(figsize=(18,8))
     ax = fig.subplots()
-    ax.plot(x, y, marker='o', linestyle='-', color='g')
-    #fig.savefig('static/plot.png')
+
+    ax.set_xticks(columns[0])
+
+    ax.set_ylabel("Measured data (ppm)")
+    ax.set_xlabel("Time since start (s)")
+
+    for j in range(len(columns)-1):
+        ax.plot(columns[0], columns[j+1], marker='o')
     buf = BytesIO()
     fig.savefig(buf, format="png")
     imdata = f'data:image/png;base64,{base64.b64encode(buf.getbuffer()).decode("ascii")}'
@@ -54,11 +64,10 @@ def index():
 
 @app.route('/get_image')
 def get_image():
-    print("hej")
+    print("getimage")
     return generate_plot()
 
 if __name__ == '__main__':
-    generate_plot()
     # Set up the watchdog observer to monitor changes in the CSV file
     event_handler = CSVHandler()
     observer = Observer()
