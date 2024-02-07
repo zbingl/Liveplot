@@ -7,24 +7,29 @@
     <title>Live Plot from CSV Data</title>
 </head>
 <body>
-    <h1>Sensor data against time since measurment start</h1>
-    <img id="livePlot">
+    <div id="demo">
+        <h1>Sensor data against time since measurment start</h1>
+        <img id='livePlot' src="{{ data }}"/>
+    </div>
+
     
+
     <script>
-        document.getElementById('livePlot').src = "{{ url_for('plot_image') }}";
-        
         function updateImage() {
-            document.getElementById('livePlot').src = "{{ url_for('plot_image') }}";
-            setTimeout(() => {  console.log("World!"); }, 3000);
-            location.reload();
-            console.log("hello");
+            fetch('/get_image')
+                .then(response => response.text())  // Expecting plain text response
+                .then(newimage => {
+                    document.getElementById('livePlot').src = newimage;
+                    console.log("hello");
+
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         
-
+        setInterval(updateImage, 1000);
         
-        // Call the updateImage function every second
-        setInterval(updateImage, 2000);
+
 
     </script>
 </body>
