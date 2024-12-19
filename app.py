@@ -6,6 +6,7 @@ from watchdog.events import FileSystemEventHandler
 from matplotlib.figure import Figure
 from io import BytesIO
 import base64
+import numpy as np
 
 app = Flask(__name__)
 
@@ -36,10 +37,18 @@ def generate_plot():
     fig = Figure(figsize=(18,8))
     ax = fig.subplots()
 
-    ax.set_xticks(columns[0])
 
-    ax.set_ylabel("Measured data (ppm)")
-    ax.set_xlabel("Time since start (s)")
+    #plt.xticks(np.arange(min(columns[0]), max(columns[0])+1, 20.0))
+    
+    start = columns[0][0]
+    end = columns[0][-1]
+
+    print(start)
+    print(end)
+    ax.xaxis.set_ticks(np.arange(start, end, (end-start)/10))
+
+    ax.set_ylabel("Measured data")
+    ax.set_xlabel("Iteration")
 
     for j in range(len(columns)-1):
         ax.plot(columns[0], columns[j+1], marker='o')
@@ -49,7 +58,11 @@ def generate_plot():
     print("New plot generated")
     return imdata
 
-data = generate_plot()
+try:
+  data = generate_plot()
+except:
+  data = [0,0]
+  print("Error: file is probably empty, generate som data") 
 
 # Watchdog event handler to detect changes in the CSV file
 class CSVHandler(FileSystemEventHandler):
