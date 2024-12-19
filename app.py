@@ -9,85 +9,104 @@ import base64
 import numpy as np
 
 app = Flask(__name__)
+dataFileName = 'data.csv'
 
-# Function to read data from CSV file
+# Reads data from CSV file
 def read_csv(file_path):
     columns = []
     with open(file_path, 'r') as file:
         csv_reader = csv.reader(file)
-        headers = next(csv_reader)  # Skip the header row
+        headers = next(csv_reader)
         num_columns = len(headers)
         
-        # Initialize lists for each column
         for _ in range(num_columns):
             columns.append([])
 
-        # Read data into columns
         for row in csv_reader:
             for i in range(num_columns):
                 columns[i].append(float(row[i]))
     return columns
 
-
-
-# Function to generate Matplotlib plot
-def generate_plot():
-    columns = read_csv('data.csv')
-
-    fig = Figure(figsize=(18,8))
+# Generates placeholder image while datafile is empty
+def generate_placeholder_plot():
+    fig = Figure(figsize=(18, 8))
     ax = fig.subplots()
-
- 
-    start = columns[0][0]
-    end = columns[0][-1]
-
-    print(start)
-    print(end)
-    ax.xaxis.set_ticks(np.arange(start, end, (end-start)/10))
-
-    ax.set_ylabel("Measured data")
-    ax.set_xlabel("Iteration")
-
-    for j in range(len(columns)-1):
-        ax.plot(columns[0], columns[j+1], marker='o')
+    ax.text(0.5, 0.5, "No Data Available", fontsize=20, ha='center', va='center', alpha=0.6)
+    ax.axis('off')
     buf = BytesIO()
     fig.savefig(buf, format="png")
-    imdata = f'data:image/png;base64,{base64.b64encode(buf.getbuffer()).decode("ascii")}'
-    print("New plot generated")
-    return imdata
+    return f'data:image/png;base64,{base64.b64encode(buf.getbuffer()).decode("ascii")}'
 
+# Generates a plot image as a Base64 string
+def generate_plot(columns):
+    if not columns or all(len(col) == 0 for col in columns):
+        return generate_placeholder_plot()
+
+
+    fig = Figure(figsize=(18, 8))
+    ax = fig.subplots()
+
+    start, end = columns[0][0], columns[0][-1]
+    ax.xaxis.set_ticks(np.linspace(start, end, 10))
+    ax.set_ylabel("Measured Data")
+    ax.set_xlabel("Iteration")
+
+    for j in range(1, len(columns)):
+        ax.plot(columns[0], columns[j], marker='o')
+
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+
+    return f'data:image/png;base64,{base64.b64encode(buf.getbuffer()).decode("ascii")}'
+
+
+# Initial data
 try:
-  data = generate_plot()
-except:
-  data = [0,0]
-  print("Error: file is probably empty, generate som data") 
+    data = generate_plot(read_csv(dataFileName))
+except Exception as e:
+    print(f"Error initializing data: {e}")
+    data = None
 
-# Watchdog event handler to detect changes in the CSV file
+# Watchdog event handler
 class CSVHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if event.src_path.endswith('.csv'):
-            data = generate_plot()
+            global data
+            try:
+                data = generate_plot(read_csv(dataFileName))
+                print("Data updated.")
+            except Exception as e:
+                print(f"Error updating data: {e}")
 
-# Route to render the HTML template with the live plot
+# Flask routes
 @app.route('/')
 def index():
-    return render_template('index.html', data = data)
+    try:
+        columns = read_csv(dataFileName)
+        plot = generate_plot(columns)
+    except:
+        print("Error")
+        plot = generate_placeholder_plot()
+    return render_template('index.html', data=plot)
 
 @app.route('/get_image')
 def get_image():
-    print("getimage")
-    return generate_plot()
+    try:
+        columns = read_csv(dataFileName)
+        return generate_plot(columns)
+    except :
+        print("Error")
+        return generate_placeholder_plot()
 
 if __name__ == '__main__':
-    # Set up the watchdog observer to monitor changes in the CSV file
+    # Start Watchdog observer
     event_handler = CSVHandler()
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
     observer.start()
 
-    # Run the Flask app
-    app.run(debug=True, use_reloader=False)
-
-    # Stop the watchdog observer when the Flask app is closed
-    observer.stop()
-    observer.join()
+    try:
+        app.run(debug=True, use_reloader=False)
+    finally:
+        observer.stop()
+        observer.join()

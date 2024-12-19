@@ -12,6 +12,11 @@ def append_to_csv(file_path, values):
     with open(file_path, 'a', newline='') as csvfile:
         csv.writer(csvfile).writerow(values)
 
+def clear_all(file_path):
+    f = open(file_path, 'w+')
+    f.close()
+
+
 def createValues(i, start_time) :
         value1 = i
         #value2 = (time.time() - start_time) + (np.log(i+1)*(random.random()+6)/7)
@@ -29,6 +34,7 @@ def initialize_csv(file_path):
         print(f"Initialized new CSV file at {file_path}")
 
 def main(file_path):
+    clear_all(file_path)
     initialize_csv(file_path)
     start_time = time.time()
 
