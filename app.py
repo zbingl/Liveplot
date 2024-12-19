@@ -37,9 +37,7 @@ def generate_plot():
     fig = Figure(figsize=(18,8))
     ax = fig.subplots()
 
-
-    #plt.xticks(np.arange(min(columns[0]), max(columns[0])+1, 20.0))
-    
+ 
     start = columns[0][0]
     end = columns[0][-1]
 
