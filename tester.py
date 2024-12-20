@@ -12,19 +12,22 @@ def append_to_csv(file_path, values):
     with open(file_path, 'a', newline='') as csvfile:
         csv.writer(csvfile).writerow(values)
 
+# Empties the CSV file
 def clear_all(file_path):
     f = open(file_path, 'w+')
     f.close()
 
-
+# Returns a list of datapoints, with the first value being a timestamp
 def createValues(i, start_time) :
-        value1 = i
-        #value2 = (time.time() - start_time) + (np.log(i+1)*(random.random()+6)/7)
+        value1 = round(time.time() - start_time, 1)
+        value2 = np.abs((np.sin((2*np.pi*time.time())/30)))
         value3 = (np.sin((2*np.pi*time.time())/10))
         value4 = (np.cos((2*np.pi*time.time())/10))
+        value5 = random.randint(-1,5)
 
-        return [value1, value3, value4]
+        return [value1, value2, value3, value4, value5]
 
+# Runs on startup
 def initialize_csv(file_path):
     if not os.path.isfile(file_path):
         with open(file_path, 'w', newline='') as csvfile:

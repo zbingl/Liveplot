@@ -1,12 +1,15 @@
 import csv
+import base64
 import matplotlib.pyplot as plt
+import numpy as np
 from flask import Flask, render_template, Response, send_file
+from io import BytesIO
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from matplotlib.figure import Figure
-from io import BytesIO
-import base64
-import numpy as np
+
+
+
 
 app = Flask(__name__)
 dataFileName = 'data.csv'
@@ -27,7 +30,7 @@ def read_csv(file_path):
                 columns[i].append(float(row[i]))
     return columns
 
-# Generates placeholder image while datafile is empty
+# Generates placeholder image while datafile is empty as a Base64 string
 def generate_placeholder_plot():
     fig = Figure(figsize=(18, 8))
     ax = fig.subplots()
@@ -49,7 +52,7 @@ def generate_plot(columns):
     start, end = columns[0][0], columns[0][-1]
     ax.xaxis.set_ticks(np.linspace(start, end, 10))
     ax.set_ylabel("Measured Data")
-    ax.set_xlabel("Iteration")
+    ax.set_xlabel("Time (s)")
 
     for j in range(1, len(columns)):
         ax.plot(columns[0], columns[j], marker='o')
@@ -87,7 +90,7 @@ def index():
     except:
         print("Error")
         plot = generate_placeholder_plot()
-    return render_template('index.html', data=plot)
+    return render_template('index.html', data=plot,)
 
 @app.route('/get_image')
 def get_image():
@@ -97,9 +100,15 @@ def get_image():
     except :
         print("Error")
         return generate_placeholder_plot()
+    
+@app.route('/get_file_name')
+def get_file_name():
+    return dataFileName
+    
 
+# Start Watchdog observer
 if __name__ == '__main__':
-    # Start Watchdog observer
+
     event_handler = CSVHandler()
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)

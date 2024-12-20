@@ -9,23 +9,31 @@
 <body>
     <div id="demo">
         <h1>Sensor data</h1>
+        <h2 id="fileName">is being read from...</h2>
         <img id='livePlot' src="{{ data }}"/>
     </div>
-
-    
 
     <script>
         function updateImage() {
             fetch('/get_image')
-                .then(response => response.text())  // Expecting plain text response
+                .then(response => response.text())
                 .then(newimage => {
                     document.getElementById('livePlot').src = newimage;
-                    console.log("hello");
-
+                    console.log("update");
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+        function updateFileName() {
+            fetch('/get_file_name')
+                .then(response => response.text())
+                .then(fileName => {
+                    document.getElementById('fileName').textContent = `is being read from ${fileName}`;
+                })
+                .catch(error => console.error('Error fetching file name:', error));
+        }
         
+        updateFileName()
         setInterval(updateImage, 1000);
     </script>
 </body>
