@@ -1,4 +1,4 @@
-# Real-Time Data Plotter with SQLite
+# Real-Time Data Plotter
 
 ## Overview
 
@@ -10,13 +10,3 @@ Liveplot visualizes data points from an SQLite database in real-time, and displa
 - SQLite backend for storing time-series data
 - Flask web interface to display the graph
 - Random data generation for testing
-
-## Technologies Used
-
-- Python 3.x
-- SQLite
-- Flask
-- matplotlib
-- NumPy
-- Watchdog
-
