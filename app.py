@@ -1,5 +1,3 @@
-import csv
-
 import sqlite3
 import base64
 import matplotlib.pyplot as plt
@@ -15,21 +13,15 @@ from matplotlib.figure import Figure
 
 app = Flask(__name__)
 dataFileName = "data.db"
-connection = sqlite3.connect(dataFileName)
-cursor = connection.cursor()
 
-
+# Returns an array of the columns without the headers
 def get_columns(filename):
-    connection = sqlite3.connect(filename)
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM data")
-    rows = cursor.fetchall()
-    connection.close()
+    with sqlite3.connect(dataFileName) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM data")
+        rows = cursor.fetchall()
     columns = list(zip(*rows))
-    print(columns)
     return columns
-
-
 
 
 # Generates placeholder image while datafile is empty as a Base64 string
@@ -81,7 +73,7 @@ class DBHandler(FileSystemEventHandler):
                 # Data file has been modified; refresh or update the plot accordingly
                 columns = get_columns(dataFileName)
                 data = generate_plot(columns)
-                print("Data updated.")
+                print("File modified")
             except Exception as e:
                 print(f"Error updating data: {e}")
 
@@ -124,6 +116,4 @@ if __name__ == '__main__':
     finally:
         observer.stop()
         observer.join()
-
-    connection.close()
 
