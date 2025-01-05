@@ -1,53 +1,54 @@
-import csv
 import random
 import time
-import os
 import numpy as np
+import sqlite3
 
-FILE_PATH = 'data.csv'
+connection = sqlite3.connect("data.db")
+cursor = connection.cursor()
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS data (
+        time INTEGER PRIMARY KEY,
+        v1 REAL DEFAULT 0,
+        v2 REAL DEFAULT 0,
+        v3 REAL DEFAULT 0,
+        v4 REAL DEFAULT 0
+    )
+""")
 
-
-# Function to append values to the CSV file
-def append_to_csv(file_path, values):
-    with open(file_path, 'a', newline='') as csvfile:
-        csv.writer(csvfile).writerow(values)
 
 # Empties the CSV file
-def clear_all(file_path):
-    f = open(file_path, 'w+')
-    f.close()
+def clear_all():
+    cursor.execute("DELETE FROM data")
 
 # Returns a list of datapoints, with the first value being a timestamp
-def createValues(i, start_time) :
+def add_new_vals(start_time) :
         value1 = round(time.time() - start_time, 1)
         value2 = np.abs((np.sin((2*np.pi*time.time())/30)))
         value3 = (np.sin((2*np.pi*time.time())/10))
         value4 = (np.cos((2*np.pi*time.time())/10))
         value5 = random.randint(-1,5)
 
-        return [value1, value2, value3, value4, value5]
+        cursor.execute("INSERT INTO data (time, v1, v2, v3, v4) VALUES (?, ?, ?, ?, ?)", 
+                       (value1, value2, value3, value4, value5))
 
-# Runs on startup
-def initialize_csv(file_path):
-    if not os.path.isfile(file_path):
-        with open(file_path, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            # Write header row for clarity
-            writer.writerow(['Value1', 'Value2', 'Value3'])
-        print(f"Initialized new CSV file at {file_path}")
 
-def main(file_path):
-    clear_all(file_path)
-    initialize_csv(file_path)
+
+def main():
     start_time = time.time()
-
     for i in range(200):
-        values = createValues(i, start_time)
-        append_to_csv(file_path, values)
-        print("{} new values appended".format(len(values)))
+        add_new_vals(start_time)
+
+        cursor.execute("SELECT MAX(time) FROM data")
+        largest_id = cursor.fetchone()[0]
+        cursor.execute("SELECT * FROM data WHERE time = ?", (largest_id,))
+        added_vals = cursor.fetchall()[0]
+
+        print(f"{len(added_vals)} new values appended")
+
         time.sleep(1)
+    connection.close()
 
 if __name__ == "__main__":
-    main(FILE_PATH)
+    main()
 
 

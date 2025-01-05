@@ -1,4 +1,6 @@
 import csv
+
+import sqlite3
 import base64
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,23 +14,23 @@ from matplotlib.figure import Figure
 
 
 app = Flask(__name__)
-dataFileName = 'data.csv'
+dataFileName = "data.db"
+connection = sqlite3.connect(dataFileName)
+cursor = connection.cursor()
 
-# Reads data from CSV file
-def read_csv(file_path):
-    columns = []
-    with open(file_path, 'r') as file:
-        csv_reader = csv.reader(file)
-        headers = next(csv_reader)
-        num_columns = len(headers)
-        
-        for _ in range(num_columns):
-            columns.append([])
 
-        for row in csv_reader:
-            for i in range(num_columns):
-                columns[i].append(float(row[i]))
+def get_columns(filename):
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM data")
+    rows = cursor.fetchall()
+    connection.close()
+    columns = list(zip(*rows))
+    print(columns)
     return columns
+
+
+
 
 # Generates placeholder image while datafile is empty as a Base64 string
 def generate_placeholder_plot():
@@ -65,27 +67,30 @@ def generate_plot(columns):
 
 # Initial data
 try:
-    data = generate_plot(read_csv(dataFileName))
+    data = generate_plot(get_columns(dataFileName))
 except Exception as e:
     print(f"Error initializing data: {e}")
     data = None
 
 # Watchdog event handler
-class CSVHandler(FileSystemEventHandler):
+class DBHandler(FileSystemEventHandler):
     def on_modified(self, event):
-        if event.src_path.endswith('.csv'):
-            global data
+        # Check if the modified file is 'data.db'
+        if event.src_path.endswith('data.db'):
             try:
-                data = generate_plot(read_csv(dataFileName))
+                # Data file has been modified; refresh or update the plot accordingly
+                columns = get_columns(dataFileName)
+                data = generate_plot(columns)
                 print("Data updated.")
             except Exception as e:
                 print(f"Error updating data: {e}")
+
 
 # Flask routes
 @app.route('/')
 def index():
     try:
-        columns = read_csv(dataFileName)
+        columns = get_columns(dataFileName)
         plot = generate_plot(columns)
     except:
         print("Error")
@@ -95,7 +100,7 @@ def index():
 @app.route('/get_image')
 def get_image():
     try:
-        columns = read_csv(dataFileName)
+        columns = get_columns(dataFileName)
         return generate_plot(columns)
     except :
         print("Error")
@@ -109,7 +114,7 @@ def get_file_name():
 # Start Watchdog observer
 if __name__ == '__main__':
 
-    event_handler = CSVHandler()
+    event_handler = DBHandler()
     observer = Observer()
     observer.schedule(event_handler, path='.', recursive=False)
     observer.start()
@@ -119,3 +124,6 @@ if __name__ == '__main__':
     finally:
         observer.stop()
         observer.join()
+
+    connection.close()
+
