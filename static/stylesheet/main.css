@@ -1,24 +1,80 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 body {
     background-color: rgb(255, 255, 255);
     font-family: Helvetica;
     text-align: center;
-    margin: 0;
 }
 
 h1 {
-    display: block;
+    background-color: #333;
+    color: white;
     font-size: 2.5em;
+    padding: 20px;
     font-weight: bold;
     text-align: center;
-    /*font-family: "Times New Roman", Times, serif;*/
     font-family: "Goudy Bookletter 1911", sans-serif;
 }
 
 h2 {
+    background-color: #6f9eb9;
+    color: white;
     display: block;
     font-size: 1.8em;
+    padding: 10px;
     font-weight: normal;
     text-align: center;
-    /*font-family: "Times New Roman", Times, serif;*/
     font-family: "Goudy Bookletter 1911", sans-serif;
+}
+
+nav {
+    -webkit-flex: 0.3;
+    -ms-flex: 0.3;
+    flex: 0.3;
+    background: #bfd3e4;
+    padding: 20px;
+}
+
+footer {
+    background-color: #6f9eb9;
+    padding: 10px;
+    text-align: center;
+    color: white;
+}
+
+.imgbox {
+    -webkit-flex: 3;
+    -ms-flex: 3;
+    flex: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    max-width: 100%;
+}
+
+.checkbox-wrapper {
+    margin-bottom: 20px; /* Space between checkboxes */
+}
+
+.checkbox-wrapper input {
+    margin-right: 10px; /* Space between checkbox and label */
+}
+
+@media (max-width: 600px) {
+    section {
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    }
 }

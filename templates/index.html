@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,37 +22,82 @@
         }
     </style>
 </head>
+
+<script>
+    function updateImage() {
+        fetch('/get_image')
+            .then(response => response.text())
+            .then(newimage => {
+                document.getElementById('livePlot').src = newimage;
+                console.log("update");
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function updateFileName() {
+        fetch('/get_file_name')
+            .then(response => response.text())
+            .then(fileName => {
+                document.getElementById('fileName').textContent = `Reading from ${fileName}`;
+            })
+            .catch(error => console.error('Error fetching file name:', error));
+    }
+
+    function addButtons() {
+        fetch('/get_nbr_of_columns')
+            .then(response => response.text())
+            .then(nbr => {
+                const numberOfColumns = parseInt(nbr, 10);
+                const container = document.getElementById('button');
+                container.textContent = '';
+    
+                for (let i = 1; i <= numberOfColumns; i++) {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `column${i}`;
+                    checkbox.name = `column${i}`;
+                    checkbox.value = i;
+    
+                    const label = document.createElement('label');
+                    label.htmlFor = `column${i}`;
+                    label.textContent = `Column ${i}`;
+    
+                    const wrapper = document.createElement('div');
+                    wrapper.classList.add('checkbox-wrapper'); 
+    
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(label);
+                    container.appendChild(wrapper);
+                }
+            })
+            .catch(error => console.error('Error fetching number of columns:', error));
+    }
+    
+    
+    
+    updateFileName()
+
+
+    addButtons()
+
+    setInterval(updateImage, 1000);
+</script>
+
+
 <body>
-    <div id="demo">
-        <h1>Sensor data</h1>
-        <h2 id="fileName">is being read from...</h2>
-    </div>
-    <div class="imgbox">
-        <img id='livePlot' class="center-fit" src="{{ data }}">
-    </div>
+    <h1>Sensor data</h1>
+    <h2 id="fileName">is being read from...</h2>
 
-    <script>
-        function updateImage() {
-            fetch('/get_image')
-                .then(response => response.text())
-                .then(newimage => {
-                    document.getElementById('livePlot').src = newimage;
-                    console.log("update");
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function updateFileName() {
-            fetch('/get_file_name')
-                .then(response => response.text())
-                .then(fileName => {
-                    document.getElementById('fileName').textContent = `is being read from ${fileName}`;
-                })
-                .catch(error => console.error('Error fetching file name:', error));
-        }
-        
-        updateFileName()
-        setInterval(updateImage, 1000);
-    </script>
+    <div class="container">
+        <nav id = "button">
+        </nav>
+        <div class="imgbox">
+            <img id='livePlot' class="center-fit" src="{{ data }}">
+        </div>
+    </div> 
+    
+    <footer>
+        <a href="https://github.com/zbingl">My Github</a>
+    </footer>
 </body>
 </html>

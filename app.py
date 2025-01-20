@@ -39,6 +39,9 @@ def generate_plot(columns):
     if not columns or all(len(col) == 0 for col in columns):
         return generate_placeholder_plot()
 
+    if columns[0][-1] > 63:
+        columns = [inner_array[-60:] for inner_array in columns]
+        print("shortened")
 
     fig = Figure(figsize=(18, 8))
     ax = fig.subplots()
@@ -101,6 +104,17 @@ def get_image():
 @app.route('/get_file_name')
 def get_file_name():
     return dataFileName
+
+@app.route('/get_nbr_of_columns')
+def get_nbr_of_columns():
+    try:
+        with sqlite3.connect(dataFileName) as connection:
+            cursor = connection.cursor()
+            cursor.execute("SELECT COUNT(*) FROM pragma_table_info('data');")
+            nbr = cursor.fetchone()[0]  
+            return str(nbr)
+    except:
+        return "error"
     
 
 # Start Watchdog observer
